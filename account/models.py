@@ -64,7 +64,7 @@ class PaymentMethod(BaseModel):
     ]
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     method = models.CharField(max_length=10, choices=METHOD_CHOICES, default='bkash')
-    description = models.TextField(blank=True, null=True)
+    payment_method_image = CloudinaryField("payment_method_image",blank=True,null=True)
 
 
 

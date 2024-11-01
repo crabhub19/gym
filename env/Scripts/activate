@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\Crabuter\Desktop\gym\env"
+VIRTUAL_ENV="J:\wark place\Web\gym\env"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

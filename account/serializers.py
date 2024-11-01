@@ -19,16 +19,20 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'password']  # Don't expose the username field
+        fields = ['email', 'password','first_name', 'last_name']  # Don't expose the username field
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         # Use email as username
         email = validated_data['email']
+        cheak_email = User.objects.filter(email=email).exists()
+        if cheak_email:
+            raise serializers.ValidationError({"msg": "Email already exists in our community."})
         user = User.objects.create_user(
             username=email,  # Set email as username
             email=email,
-            password=validated_data['password']
+            password=validated_data['password'],
+            is_active=False
         )
         return user
     
@@ -38,7 +42,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Accounts
-        fields = ['user', 'role', 'join_date', 'activate_date', 'active']
+        fields = ['user','phone_number']
 
     def create(self, validated_data):
         # Extract the user data
