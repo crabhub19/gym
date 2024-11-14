@@ -40,7 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
         last_name = validated_data['last_name']
         cheak_email = User.objects.filter(email=email).exists()
         if cheak_email:
-            raise serializers.ValidationError("Email already exists in our community.")
+            raise serializers.ValidationError({"detail":"Email already exists."})
         user = User.objects.create_user(
             username=email,  # Set email as username
             email=email,
