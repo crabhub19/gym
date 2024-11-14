@@ -137,7 +137,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 STATIC_URL = '/static/'
 # STATICFILES_DIRS = [BASE_DIR / 'static']
-
+# Media URL and root for Cloudinary storage
+MEDIA_URL = '/media/'
 
 
 
@@ -151,8 +152,7 @@ cloudinary.config(
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# Media URL and root for Cloudinary storage
-MEDIA_URL = '/media/'
+
 
 
 # Default primary key field type
