@@ -4,10 +4,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import ValidationError
 from .models import *
 from .serializers import *
-
+from .permissions import IsAdminOrReadOnly
 # for sending mails and generate token
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -46,6 +47,11 @@ class TransactionViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Automatically set the sender to the logged-in user when creating a transaction
         serializer.save(sender=self.request.user)
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Transaction.objects.all()  # Admin sees all
+        return Transaction.objects.filter(sender=user)  # Users see only their own transactions
 
 
 
@@ -64,26 +70,59 @@ class AccountViewSet(viewsets.ModelViewSet):
 
         # Send email for verification
         mail_subject = 'Activate your account'
-        message = render_to_string('account/verification_email.html', {
+        mail_message = render_to_string('account/verification_email.html', {
             'user': user,
             'domain': current_site,
             'uid': uid,
             'token': token,
             'verification_link': verification_link,
         })
-        print(message)
-        # send_mail(mail_subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+        print(mail_message)
+        send_mail(mail_subject, mail_message, settings.DEFAULT_FROM_EMAIL, [user.email])
     @action(detail=False, methods=['get'], url_path='verify-email/(?P<uidb64>[^/.]+)/(?P<token>[^/.]+)')
     def verify_email(self, request, uidb64=None, token=None):
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            return Response({'msg': 'Invalid Token or user not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Invalid Token or user not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if generate_token.check_token(user, token):
             user.is_active = True
             user.save()
-            return Response({'msg': 'Email successfully verified.'}, status=status.HTTP_200_OK)
+            return Response({'message': 'Email successfully verified.'}, status=status.HTTP_200_OK)
         else:
-            return Response({'msg': 'Invalid or expired token.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Invalid or expired token.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+class PaymentMethodViewSet(viewsets.ModelViewSet):
+    queryset = PaymentMethod.objects.all()
+    serializer_class = PaymentMethodSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+
+
+
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+    #  Custom action to fetch the logged-in user's profile
+    @action(detail=False, methods=['get'], url_path='me')
+    def my_profile(self, request):
+        try:
+            # Fetch the profile of the logged-in user
+            profile = Profile.objects.get(account__user=request.user)
+        except Profile.DoesNotExist:
+            # If no profile exists, raise a NotFound error
+            raise NotFound(detail="Profile not found for the logged-in user.")
+        serializer = self.get_serializer(profile)
+        return Response(serializer.data)
+    def get_object(self): 
+        try: 
+            profile = Profile.objects.get(account__user=self.request.user) 
+            return profile 
+        except Profile.DoesNotExist: 
+            raise NotFound(detail="Profile not found for the logged-in user.")

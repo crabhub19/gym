@@ -62,17 +62,29 @@ class PaymentMethod(BaseModel):
         ('rocket', 'Rocket'),
         ('all', 'Bkash, Nagad, Rocket'),
     ]
+    TYPE_CHOICES = [
+        ('personal', 'Personal'),
+        ('agent', 'Agent'),
+    ]
     phone_number = models.CharField(max_length=15, blank=True, null=True)
-    method = models.CharField(max_length=10, choices=METHOD_CHOICES, default='bkash')
+    method = models.CharField(max_length=10, choices=METHOD_CHOICES, default='Bkash')
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='Personal')
     payment_method_image = CloudinaryField("payment_method_image",blank=True,null=True)
 
+    def __str__(self):
+        return self.phone_number
 
 
 class Profile(BaseModel):
     account = models.OneToOneField(Accounts, on_delete=models.CASCADE)  # One-to-one relationship with Account
-    bio = models.TextField(blank=True)  # Bio field for the user
     profile_picture = CloudinaryField("profile_picture",blank=True,null=True)   # URL for Cloudinary
-    cover_picture = CloudinaryField("cover_picture",blank=True,null=True)
+    followers = models.ManyToManyField(User, related_name="following_profiles", blank=True)
+    bio = models.TextField(blank=True)  # Bio field for the user
+    about = models.TextField(blank=True)
+    age = models.PositiveIntegerField(blank=True, null=True)
+    weight = models.FloatField(blank=True, null=True)
+    height = models.FloatField(blank=True,null=True)
+    address = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return f"{self.account.user.username}'s Profile"

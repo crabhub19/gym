@@ -1,64 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Activate Your Account</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333333;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            color: #333333;
-        }
-        p {
-            line-height: 1.6;
-        }
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 20px 0;
-            background-color: #4CAF50;
-            color: #ffffff;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 5px;
-        }
-        .button:hover {
-            background-color: #45a049;
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #777777;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Hello {{ user.username }},</h2>
-        <p>Thank you for signing up! Please verify your email address to activate your account.</p>
-        
-        <p>Click the button below to verify your email address:</p>
-        <p><a href="{{ verification_link }}" target="_blank" class="button">Activate Your Account</a></p>
-        
-        <p>If the button doesn't work, you can also copy and paste this URL into your browser:</p>
-        <p>{{ verification_link }}</p>
-        
-        <div class="footer">
-            <p>Thanks, <br>The Team at {{ domain }}</p>
-        </div>
-    </div>
-</body>
-</html>
+Hello {{ user.username }},
+
+Thank you for registering with us! To complete your registration and activate your account, please verify your email address by clicking the link below:
+
+{{ verification_link }}
+
+If the above link does not work, copy and paste the following URL into your browser:
+
+{{ verification_link }}
+
+Thank you,
+Your Website Team

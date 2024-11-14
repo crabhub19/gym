@@ -10,6 +10,8 @@ from .views import *
 router = DefaultRouter()
 router.register(r'transactions', TransactionViewSet)
 router.register(r'accounts', AccountViewSet)
+router.register(r'paymentMethod', PaymentMethodViewSet)
+router.register(r'profile', ProfileViewSet)
 
 # Include the router URLs
 urlpatterns = [
@@ -17,6 +19,5 @@ urlpatterns = [
         # Auth-related routes
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    re_path(r'^__debug__/', include('debug_toolbar.urls')),
     path('', include(router.urls)),
 ]

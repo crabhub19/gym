@@ -42,3 +42,4 @@ admin.site.register(Accounts, AccountsAdmin)
 admin.site.register(Transaction, TransactionAdmin)
 # Register the other model 
 admin.site.register(Profile)
+admin.site.register(PaymentMethod)
