@@ -1,10 +1,11 @@
 from django.contrib import admin
+from unfold.admin import ModelAdmin
 from .models import *  # Import the model
 
 
 
 # Customizing the display of Accounts in the admin panel
-class AccountsAdmin(admin.ModelAdmin):
+class AccountsAdmin(ModelAdmin):
     list_display = ('user', 'role', 'phone_number', 'join_date', 'activate_date', 'active')
     list_filter = ('role', 'active', 'join_date', 'activate_date')
     search_fields = ('user__username', 'phone_number', 'role')
@@ -31,7 +32,7 @@ class AccountsAdmin(admin.ModelAdmin):
 
 
 # Customizing the display of Transactions in the admin panel
-class TransactionAdmin(admin.ModelAdmin):
+class TransactionAdmin(ModelAdmin):
     list_display = ('sender', 'amount', 'status', 'timestamp')
     list_filter = ('status', 'timestamp')
     search_fields = ('sender__username', 'transaction_id')
