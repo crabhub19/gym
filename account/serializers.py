@@ -56,7 +56,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Accounts
-        fields = ['user','phone_number']
+        fields = ['user','phone_number','role','active']
 
     def create(self, validated_data):
         # Extract the user data
@@ -91,7 +91,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     account = AccountSerializer()
     profile_picture_url = serializers.SerializerMethodField()
     followers = serializers.StringRelatedField(many=True)
-
     class Meta:
         model = Profile
         fields = ['account', 'profile_picture','profile_picture_url','followers', 'bio', 'about', 'age', 'weight', 'height', 'address', 'id']
@@ -118,7 +117,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
-
+    
     def get_profile_picture_url(self, obj):
         if obj.profile_picture:
             return obj.profile_picture.url

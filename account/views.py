@@ -12,7 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import *
 from .serializers import *
-from .permissions import IsAdminOrReadOnly
+from .permissions import *
 
 # for sending mails and generate token
 from django.core.mail import send_mail
@@ -126,7 +126,6 @@ class AccountViewSet(viewsets.ModelViewSet):
             return Response({'detail': 'Email successfully verified.'}, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'Invalid or expired token.'}, status=status.HTTP_400_BAD_REQUEST)
-        
 
 
 class PaymentMethodViewSet(viewsets.ModelViewSet):
@@ -141,7 +140,7 @@ class PaymentMethodViewSet(viewsets.ModelViewSet):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnlyCustom]
     #  Custom action to fetch the logged-in user's profile
     @action(detail=False, methods=['get','patch'], url_path='me')
     def my_profile(self, request):

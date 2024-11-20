@@ -5,6 +5,15 @@ from .models import *  # Import the model
 
 
 # Customizing the display of Accounts in the admin panel
+class UserAdmin(ModelAdmin):
+    list_display = ('username', 'email', 'is_staff', 'is_superuser', 'is_active')
+    list_filter = ('is_staff', 'is_superuser', 'is_active')
+    search_fields = ('username',)
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+
+
 class AccountsAdmin(ModelAdmin):
     list_display = ('user', 'role', 'phone_number', 'join_date', 'activate_date', 'active')
     list_filter = ('active', 'role', 'join_date', 'activate_date')
@@ -37,10 +46,20 @@ class TransactionAdmin(ModelAdmin):
     list_filter = ('status', 'timestamp')
     search_fields = ('sender__username', 'transaction_id')
     ordering = ['-timestamp']
+class ProfileAdmin(ModelAdmin):
+    list_display = ('get_username', 'age', 'weight', 'height', 'address')
+    actions = ['delete_selected']  # Enable bulk delete action
+    search_fields = ('account__user__username', 'account__user__email', 'bio')
 
+    def get_username(self, obj):
+        return obj.account.user.username
+    get_username.short_description = 'Username'
+
+    
+    
 # Register the models and their custom admin views
-admin.site.register(Accounts, AccountsAdmin)
 admin.site.register(Transaction, TransactionAdmin)
+admin.site.register(Accounts, AccountsAdmin)
 # Register the other model 
-admin.site.register(Profile)
+admin.site.register(Profile, ProfileAdmin)
 admin.site.register(PaymentMethod)

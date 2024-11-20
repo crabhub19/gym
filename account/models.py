@@ -18,7 +18,7 @@ class Accounts(BaseModel):
         ('trainer', 'Trainer'),
         ('manager', 'Manager'),
     ]
-    user = models.OneToOneField(User, on_delete=models.CASCADE)  # One-to-one relationship with User
+    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name='accounts')  # One-to-one relationship with User
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='member')
     join_date = models.DateField(default=timezone.now)  # Join date field
@@ -33,7 +33,12 @@ class Accounts(BaseModel):
         return {
             sent_transactions
         }
-
+    def delete(self, *args, **kwargs):
+        # Get the associated user
+        user = self.user
+        # Delete the associated user (and all related objects)
+        user.delete()
+        super().delete(*args, **kwargs)
 
 class Transaction(models.Model):
     STATUS_CHOICES = [
@@ -76,7 +81,7 @@ class PaymentMethod(BaseModel):
 
 
 class Profile(BaseModel):
-    account = models.OneToOneField(Accounts, on_delete=models.CASCADE)  # One-to-one relationship with Account
+    account = models.OneToOneField(Accounts, on_delete=models.CASCADE,related_name='profile')  # One-to-one relationship with Account
     profile_picture = CloudinaryField("profile_picture",blank=True,null=True)   # URL for Cloudinary
     followers = models.ManyToManyField(User, related_name="following_profiles", blank=True)
     bio = models.TextField(blank=True)  # Bio field for the user
@@ -85,6 +90,13 @@ class Profile(BaseModel):
     weight = models.FloatField(blank=True, null=True)
     height = models.FloatField(blank=True,null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
+    
+    def delete(self, *args, **kwargs):
+        # Get the associated user
+        user = self.account.user
+        # Delete the associated user (and all related objects)
+        user.delete()
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return f"{self.account.user.username}'s Profile"
