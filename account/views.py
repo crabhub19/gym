@@ -9,6 +9,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.parsers import MultiPartParser, FormParser
 from .models import *
 from .serializers import *
 from .permissions import IsAdminOrReadOnly
@@ -142,7 +143,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
     #  Custom action to fetch the logged-in user's profile
-    @action(detail=False, methods=['get'], url_path='me')
+    @action(detail=False, methods=['get','patch'], url_path='me')
     def my_profile(self, request):
         try:
             # Fetch the profile of the logged-in user
@@ -150,11 +151,14 @@ class ProfileViewSet(viewsets.ModelViewSet):
         except Profile.DoesNotExist:
             # If no profile exists, raise a NotFound error
             raise NotFound(detail="Profile not found for the logged-in user.")
-        serializer = self.get_serializer(profile)
-        return Response(serializer.data)
-    def get_object(self): 
-        try: 
-            profile = Profile.objects.get(account__user=self.request.user) 
-            return profile 
-        except Profile.DoesNotExist: 
-            raise NotFound(detail="Profile not found for the logged-in user.")
+        if request.method == 'GET':
+            # Serialize and return the profile data
+            serializer = self.get_serializer(profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        elif request.method == 'PATCH':
+            # Partially update the profile with the provided data
+            serializer = self.get_serializer(profile, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

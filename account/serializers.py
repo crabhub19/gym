@@ -24,7 +24,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 # Serializer for the User model
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()  # Explicitly define the email field
-
     class Meta:
         model = User
         fields = ['email', 'password','first_name', 'last_name']  # Don't expose the username field
@@ -90,13 +89,39 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
 # Serializer for the Profile model
 class ProfileSerializer(serializers.ModelSerializer):
     account = AccountSerializer()
-    # Use AccountSerializer to serialize nested account data 
-    profile_picture = serializers.SerializerMethodField()
-    followers = serializers.StringRelatedField(many=True) 
-    class Meta: 
-        model = Profile 
-        fields = ['account','profile_picture', 'followers', 'bio', 'about', 'age', 'weight', 'height','address','id'] 
+    profile_picture_url = serializers.SerializerMethodField()
+    followers = serializers.StringRelatedField(many=True)
 
-    def get_profile_picture(self, obj):
+    class Meta:
+        model = Profile
+        fields = ['account', 'profile_picture','profile_picture_url','followers', 'bio', 'about', 'age', 'weight', 'height', 'address', 'id']
+        
+    def update(self, instance, validated_data):
+        account_data = validated_data.get('account', {})
+        user_data = account_data.get('user', {})
+        # Handle user data
+        if user_data:
+            user = instance.account.user  # Assuming Profile has a related Account
+            for field, value in user_data.items():
+                setattr(user, field, value)
+            user.save()
+            
+        # Handle account data, including phone number
+        if 'phone_number' in account_data:
+            instance.account.phone_number = account_data['phone_number']
+            instance.account.save()
+            
+        # Handle other account and profile data
+        for field, value in validated_data.items():
+            if field != 'account':  # Don't overwrite the account object again
+                setattr(instance, field, value)
+        instance.save()
+
+        return instance
+
+    def get_profile_picture_url(self, obj):
         if obj.profile_picture:
             return obj.profile_picture.url
+        return None  # Return None if no profile picture exists
+
+

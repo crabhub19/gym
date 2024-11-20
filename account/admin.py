@@ -7,7 +7,7 @@ from .models import *  # Import the model
 # Customizing the display of Accounts in the admin panel
 class AccountsAdmin(ModelAdmin):
     list_display = ('user', 'role', 'phone_number', 'join_date', 'activate_date', 'active')
-    list_filter = ('role', 'active', 'join_date', 'activate_date')
+    list_filter = ('active', 'role', 'join_date', 'activate_date')
     search_fields = ('user__username', 'phone_number', 'role')
     
     # Restricting role assignment based on admin privileges
