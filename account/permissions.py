@@ -10,15 +10,3 @@ class IsAdminOrReadOnly(BasePermission):
             return True
         # Write permissions are only allowed to admin users
         return request.user and request.user.is_staff
-
-class IsAuthenticatedOrReadOnlyCustom(BasePermission):
-    """
-    Custom permission to only allow authenticated users to perform any action,
-    but allow read-only access to unauthenticated users.
-    """
-    def has_permission(self, request, view):
-        # Allow read-only access for unauthenticated users
-        if request.method in SAFE_METHODS:
-            return True
-        # Allow full access for authenticated users
-        return request.user and request.user.is_authenticated

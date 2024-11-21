@@ -56,7 +56,11 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Accounts
-        fields = ['user','phone_number','role','active']
+        fields = ['id','user','phone_number','role','active']
+        extra_kwargs = {
+            'role': {'read_only': True},
+            'active': {'read_only': True},
+        }
 
     def create(self, validated_data):
         # Extract the user data
@@ -93,7 +97,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     followers = serializers.StringRelatedField(many=True)
     class Meta:
         model = Profile
-        fields = ['account', 'profile_picture','profile_picture_url','followers', 'bio', 'about', 'age', 'weight', 'height', 'address', 'id']
+        fields = ['id','account', 'profile_picture','profile_picture_url','followers', 'bio', 'about', 'age', 'weight', 'height', 'address']
         
     def update(self, instance, validated_data):
         account_data = validated_data.get('account', {})

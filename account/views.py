@@ -1,5 +1,5 @@
 from rest_framework import viewsets,status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import *
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -84,6 +84,13 @@ class TransactionViewSet(viewsets.ModelViewSet):
 class AccountViewSet(viewsets.ModelViewSet):
     queryset = Accounts.objects.all()
     serializer_class = AccountSerializer
+    def get_permissions(self):
+        if self.request.method in ['GET', 'POST']:
+            return [AllowAny()]
+        elif self.request.method in ['PATCH', 'PUT','DELETE']:
+            return [IsAuthenticated()]  # Use built-in permission for authenticated users
+        return super().get_permissions()
+
     def perform_create(self, serializer):
         # Get the username from the validated data
         user_data = serializer.validated_data['user']
@@ -140,7 +147,7 @@ class PaymentMethodViewSet(viewsets.ModelViewSet):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [IsAuthenticatedOrReadOnlyCustom]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     #  Custom action to fetch the logged-in user's profile
     @action(detail=False, methods=['get','patch'], url_path='me')
     def my_profile(self, request):
