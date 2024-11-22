@@ -42,10 +42,14 @@ class AccountsAdmin(ModelAdmin):
 
 # Customizing the display of Transactions in the admin panel
 class TransactionAdmin(ModelAdmin):
-    list_display = ('sender', 'amount', 'status', 'timestamp')
+    list_display = ('display_sender', 'amount', 'status', 'timestamp')
     list_filter = ('status', 'timestamp')
     search_fields = ('sender__username', 'transaction_id')
     ordering = ['-timestamp']
+    def display_sender(self, obj):
+        return obj.sender if obj.sender else obj.sender_email
+    display_sender.short_description = 'Sender'
+    
 class ProfileAdmin(ModelAdmin):
     list_display = ('get_username', 'age', 'weight', 'height', 'address')
     actions = ['delete_selected']  # Enable bulk delete action
@@ -56,10 +60,11 @@ class ProfileAdmin(ModelAdmin):
     get_username.short_description = 'Username'
 
     
-    
+class PaymentMethodAdmin(ModelAdmin):
+    pass
 # Register the models and their custom admin views
 admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(Accounts, AccountsAdmin)
 # Register the other model 
 admin.site.register(Profile, ProfileAdmin)
-admin.site.register(PaymentMethod)
+admin.site.register(PaymentMethod,PaymentMethodAdmin)

@@ -68,16 +68,22 @@ class CustomTokenObtainPairView(APIView):
 class TransactionViewSet(viewsets.ModelViewSet):
     queryset = Transaction.objects.all()  # Base queryset for the model
     serializer_class = TransactionSerializer
-    permission_classes = [IsAuthenticated]  # Ensure that the user is authenticated
+
+    def get_permissions(self):
+        if self.request.method in ['POST']:
+            return [AllowAny()]  # Allow POST requests for any user
+        elif self.request.method in ['GET', 'PATCH', 'PUT', 'DELETE']:
+            return [IsAdminOrReadOnly()]
+        return super().get_permissions()
 
     def perform_create(self, serializer):
         # Automatically set the sender to the logged-in user when creating a transaction
-        serializer.save(sender=self.request.user)
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_staff:
-            return Transaction.objects.all()  # Admin sees all
-        return Transaction.objects.filter(sender=user)  # Users see only their own transactions
+        serializer.save(sender=self.request.user if self.request.user.is_authenticated else None)
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     if user.is_staff:
+    #         return Transaction.objects.all()  # Admin sees all
+    #     return Transaction.objects.filter(sender=user)  # Users see only their own transactions
 
 
 

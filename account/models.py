@@ -47,17 +47,27 @@ class Transaction(models.Model):
         ('failed', 'Failed'),
     ]
 
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='sent_transactions', on_delete=models.CASCADE)
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        related_name='sent_transactions', 
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True
+    )
+    sender_email = models.EmailField(null=True, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    transaction_id = models.CharField(max_length=100)
+    transaction_id = models.CharField(max_length=100, unique=True)  # Marking as unique for better identification
     timestamp = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-
+    status = models.CharField(
+        max_length=10, 
+        choices=STATUS_CHOICES, 
+        default='pending'
+    )
     def __str__(self):
         return f'{self.sender} sent {self.amount}'
- 
     class Meta:
         ordering = ['-timestamp']
+
 
 
 class PaymentMethod(BaseModel):

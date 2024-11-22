@@ -13,6 +13,7 @@ router.register(r'accounts', AccountViewSet)
 router.register(r'paymentMethod', PaymentMethodViewSet)
 router.register(r'profile', ProfileViewSet)
 
+
 # Include the router URLs
 urlpatterns = [
     path('', include(router.urls)),  # Include the router URLs under the /api/ path
