@@ -155,7 +155,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     #  Custom action to fetch the logged-in user's profile
-    @action(detail=False, methods=['get','patch'], url_path='me')
+    @action(detail=False, methods=['get','patch','delete'], url_path='me')
     def my_profile(self, request):
         try:
             # Fetch the profile of the logged-in user
@@ -174,3 +174,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        elif request.method == 'DELETE':
+            # Delete the profile
+            profile.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
