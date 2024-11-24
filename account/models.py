@@ -100,7 +100,11 @@ class Profile(BaseModel):
     weight = models.FloatField(blank=True, null=True)
     height = models.FloatField(blank=True,null=True)
     address = models.CharField(max_length=100, blank=True, null=True)
-    
+    Gender = [
+        ('male', 'Male'),
+        ('female', 'Female')
+    ]
+    gender = models.CharField(max_length=10, choices=Gender, blank=True, null=True)
     def delete(self, *args, **kwargs):
         # Get the associated user
         user = self.account.user

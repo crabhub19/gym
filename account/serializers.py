@@ -97,7 +97,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     followers = serializers.StringRelatedField(many=True)
     class Meta:
         model = Profile
-        fields = ['id','account', 'profile_picture','profile_picture_url','followers', 'bio', 'about', 'age', 'weight', 'height', 'address']
+        fields = ['id','account', 'profile_picture','profile_picture_url','followers', 'bio', 'about', 'age', 'weight', 'height', 'address','gender']
         
     def update(self, instance, validated_data):
         account_data = validated_data.get('account', {})

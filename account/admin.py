@@ -9,7 +9,21 @@ class UserAdmin(ModelAdmin):
     list_display = ('username', 'email', 'is_staff', 'is_superuser', 'is_active')
     list_filter = ('is_staff', 'is_superuser', 'is_active')
     search_fields = ('username',)
+    # Custom actions defined as methods
+    @admin.action(description='Deactivate selected users')
+    def deactivate_users(self, request, queryset):
+        queryset.update(is_active=False)
 
+    @admin.action(description='Activate selected users')
+    def activate_users(self, request, queryset):
+        queryset.update(is_active=True)
+
+    @admin.action(description='Delete inactive users')
+    def delete_inactive_users(self, request, queryset):
+        queryset.filter(is_active=False).delete()
+
+    # Register the actions
+    actions = ['deactivate_users', 'activate_users', 'delete_inactive_users']
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
