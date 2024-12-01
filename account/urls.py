@@ -12,7 +12,7 @@ router.register(r'transactions', TransactionViewSet)
 router.register(r'accounts', AccountViewSet)
 router.register(r'paymentMethod', PaymentMethodViewSet)
 router.register(r'profile', ProfileViewSet)
-
+router.register(r'contractUs', ContractUsViewSet)
 
 # Include the router URLs
 urlpatterns = [

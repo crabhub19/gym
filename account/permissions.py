@@ -10,6 +10,13 @@ class IsAdminOrReadOnly(BasePermission):
             return True
         # Write permissions are only allowed to admin users
         return request.user and request.user.is_staff
-class AllowInactiveUser(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_authenticated  # Ignore `is_active` check
+class IsAdminOrPostOnly(BasePermission): 
+    def has_permission(self, request, view): 
+        # Allow access if the user is an admin 
+        if request.user and request.user.is_staff: 
+            return True 
+        # Allow access if the request method is POST 
+        if request.method == 'POST': 
+            return True 
+        # Deny access otherwise 
+        return False

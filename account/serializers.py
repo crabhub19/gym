@@ -128,3 +128,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         return None  # Return None if no profile picture exists
 
 
+class ContractUsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContractUs
+        fields = '__all__'

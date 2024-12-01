@@ -178,3 +178,26 @@ class ProfileViewSet(viewsets.ModelViewSet):
             # Delete the profile
             profile.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+        
+
+class ContractUsViewSet(viewsets.ModelViewSet):
+    queryset = ContractUs.objects.all()
+    serializer_class = ContractUsSerializer
+    permission_classes = [IsAdminOrPostOnly]
+    def perform_create(self, serializer):
+        contractUs = serializer.save()
+        self.send_contract_email(contractUs)
+    def send_contract_email(self,contractUs):
+        mail_subject = 'Contract Us'
+        mail_message = render_to_string('account/contractus_email.html', {
+            'contractUs': contractUs,
+        })
+        send_mail(
+            subject=mail_subject,
+            message=mail_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=['3xbishal@gmail.com']
+        )
+
+        
+    

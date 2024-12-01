@@ -76,9 +76,12 @@ class ProfileAdmin(ModelAdmin):
     
 class PaymentMethodAdmin(ModelAdmin):
     pass
+class ContractUsAdmin(ModelAdmin):
+    pass
 # Register the models and their custom admin views
 admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(Accounts, AccountsAdmin)
 # Register the other model 
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(PaymentMethod,PaymentMethodAdmin)
+admin.site.register(ContractUs,ContractUsAdmin)
