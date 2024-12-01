@@ -26,7 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()  # Explicitly define the email field
     class Meta:
         model = User
-        fields = ['email', 'password','first_name', 'last_name']  # Don't expose the username field
+        fields = ['id','email', 'password','first_name', 'last_name']  # Don't expose the username field
         extra_kwargs = {
             'password': {'write_only': True},
             'email': {'read_only': True} # Make email read-only

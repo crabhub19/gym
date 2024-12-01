@@ -52,6 +52,14 @@ class AccountsAdmin(ModelAdmin):
             obj.user.is_staff = True  # Managers should have admin privileges
         obj.user.save()
         super().save_model(request, obj, form, change)
+    
+    @admin.action(description='make manager')
+    def make_manager(self, request, queryset):
+        queryset.update(role='manager')
+    @admin.action(description='make trainer')
+    def make_trainer(self, request, queryset):
+        queryset.update(role='trainer')
+    actions = ['make_manager', 'make_trainer']
 
 
 # Customizing the display of Transactions in the admin panel
