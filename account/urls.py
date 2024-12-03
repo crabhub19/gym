@@ -8,10 +8,11 @@ from .views import *
 
 # Create a router and register the TransactionViewSet
 router = DefaultRouter()
-router.register(r'transactions', TransactionViewSet)
 router.register(r'accounts', AccountViewSet)
-router.register(r'paymentMethod', PaymentMethodViewSet)
 router.register(r'profile', ProfileViewSet)
+router.register(r'users', UserViewSet)
+router.register(r'transactions', TransactionViewSet)
+router.register(r'paymentMethod', PaymentMethodViewSet)
 router.register(r'contractUs', ContractUsViewSet)
 
 # Include the router URLs
