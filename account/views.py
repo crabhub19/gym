@@ -65,12 +65,12 @@ class RequestPasswordResetView(APIView):
         email = request.data.get('email')
 
         if not email:
-            return Response({'error': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response({'error': 'User with this email does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'User with this email does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Create or update PasswordReset entry
         reset_entry, created = PasswordReset.objects.get_or_create(user=user)
@@ -78,51 +78,42 @@ class RequestPasswordResetView(APIView):
             reset_entry.uuid = str(random.randint(100000, 999999))  # Generate a new UUID
             reset_entry.created_at = now()
             reset_entry.save()
-
-        # Send email with UUID
-        # send_mail(
-        #     'Password Reset Request',
-        #     f'Your password reset code is: {reset_entry.uuid}',
-        #     'no-reply@example.com',
-        #     [user.email],
-        #     fail_silently=False,
-        # )
         send_mail("Password Reset Request", f'Your password reset code is: {reset_entry.uuid}', settings.DEFAULT_FROM_EMAIL, [user.email])
         
 
-        return Response({'message': 'Password reset email sent.'}, status=status.HTTP_200_OK)
+        return Response({'detail': 'Password reset email sent.'}, status=status.HTTP_200_OK)
 
 class ValidatePasswordResetUUIDView(APIView):
     def post(self, request):
         uuid_code = request.data.get('uuid_code')
 
         if not uuid_code:
-            return Response({'error': 'UUID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'UUID is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             reset_entry = PasswordReset.objects.get(uuid=uuid_code)
         except PasswordReset.DoesNotExist:
-            return Response({'error': 'Invalid or expired UUID.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Invalid or expired UUID.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if not reset_entry.is_valid():
-            return Response({'error': 'UUID has expired.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'UUID has expired.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'message': 'UUID is valid.'}, status=status.HTTP_200_OK)
+        return Response({'detail': 'UUID is valid.'}, status=status.HTTP_200_OK)
 class ResetPasswordView(APIView):
     def post(self, request):
         uuid_code = request.data.get('uuid_code')
         new_password = request.data.get('new_password')
 
         if not uuid_code or not new_password:
-            return Response({'error': 'UUID and new password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'UUID and new password are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             reset_entry = PasswordReset.objects.get(uuid=uuid_code)
         except PasswordReset.DoesNotExist:
-            return Response({'error': 'Invalid or expired UUID.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Invalid or expired UUID.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if not reset_entry.is_valid():
-            return Response({'error': 'UUID has expired.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'UUID has expired.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Update the password
         user = reset_entry.user
@@ -132,7 +123,7 @@ class ResetPasswordView(APIView):
         # Delete the PasswordReset entry
         reset_entry.delete()
 
-        return Response({'message': 'Password reset successful.'}, status=status.HTTP_200_OK)
+        return Response({'detail': 'Password reset successful.'}, status=status.HTTP_200_OK)
 
 
 
@@ -243,7 +234,7 @@ class PaymentMethodViewSet(viewsets.ModelViewSet):
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
+    queryset = Profile.objects.filter(account__user__is_active=True)
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     #  Custom action to fetch the logged-in user's profile
