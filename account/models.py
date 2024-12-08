@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from cloudinary.models import CloudinaryField
 from django.utils import timezone
-import uuid
+import random
 from datetime import timedelta
 from django.utils.timezone import now
 # Create your models here.
@@ -18,7 +18,7 @@ class BaseModel(models.Model):
 #reset passwork   
 class PasswordReset(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='password_reset')
-    uuid = models.CharField(max_length=6, unique=True, default="000000")
+    uuid = models.CharField(max_length=6, unique=True, default=str(random.randint(1000, 9999)))
     created_at = models.DateTimeField(auto_now_add=True)
 
     def is_valid(self):

@@ -75,7 +75,7 @@ class RequestPasswordResetView(APIView):
         # Create or update PasswordReset entry
         reset_entry, created = PasswordReset.objects.get_or_create(user=user)
         if not created:
-            reset_entry.uuid = str(random.randint(100000, 999999))  # Generate a new UUID
+            reset_entry.uuid = str(random.randint(1000, 9999))  # Generate a new UUID
             reset_entry.created_at = now()
             reset_entry.save()
         send_mail("Password Reset Request", f'Your password reset code is: {reset_entry.uuid}', settings.DEFAULT_FROM_EMAIL, [user.email])
