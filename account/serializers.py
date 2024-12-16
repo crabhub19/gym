@@ -128,6 +128,18 @@ class ProfileSerializer(serializers.ModelSerializer):
         return None  # Return None if no profile picture exists
 
 
+class PostSerializer(serializers.ModelSerializer):
+    like_count = serializers.ReadOnlyField()
+    class Meta:
+        model = Post
+        fields = 'id','author','content','post_image','like_count'
+class PostLikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostLike
+        fields = 'id','post','profile','created_at'
+
+
+
 class ContractUsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContractUs

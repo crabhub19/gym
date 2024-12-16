@@ -14,6 +14,7 @@ router.register(r'users', UserViewSet)
 router.register(r'transactions', TransactionViewSet)
 router.register(r'paymentMethod', PaymentMethodViewSet)
 router.register(r'contractUs', ContractUsViewSet)
+router.register(r"post", PostViewSet)
 
 # Include the router URLs
 urlpatterns = [

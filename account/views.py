@@ -261,6 +261,21 @@ class ProfileViewSet(viewsets.ModelViewSet):
             # Delete the profile
             profile.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all().order_by('-created_at')
+    serializer_class = PostSerializer
+    # parser_classes = [MultiPartParser, FormParser]  # Add these parsers
+    def create(self, request, *args, **kwargs):
+        request.data['author'] = request.user.accounts.profile.id
+        return super().create(request, *args, **kwargs)
+    @action(detail=True, methods=['post'])
+    def like(self, request, pk):
+        post = get_object_or_404(Post,pk=pk)
+        like,created = PostLike.objects.get_or_create(post=post,profile__account__user=request.user)
+        if not created:
+            like.delete()
+        return Response({'detail': 'Like toggled successfully.'}, status=status.HTTP_200_OK)
         
 
 class ContractUsViewSet(viewsets.ModelViewSet):

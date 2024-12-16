@@ -3,10 +3,22 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from cloudinary.models import CloudinaryField
 from django.utils import timezone
-import random
+import uuid,random
 from datetime import timedelta
 from django.utils.timezone import now
+
+#function to generate
+def generate_short_uuid():
+    """Generate a unique 4-character UUID."""
+    return str(random.randint(1000, 9999))
+
+
+
 # Create your models here.
+
+
+
+
 
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -15,10 +27,10 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
         
-#reset passwork   
+#reset password   
 class PasswordReset(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='password_reset')
-    uuid = models.CharField(max_length=6, unique=True, default=str(random.randint(1000, 9999)))
+    uuid = models.CharField(max_length=4, unique=True, default=generate_short_uuid, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def is_valid(self):
@@ -132,6 +144,29 @@ class Profile(BaseModel):
 
     def __str__(self):
         return f"{self.account.user.username}'s Profile"
+    
+
+# Post 
+class Post(BaseModel):
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE,related_name='posts')
+    content = models.TextField(null=True,blank=True)
+    post_image = CloudinaryField("post_image",blank=True,null=True)
+    @property
+    def like_count(self):
+        return self.post_likes.count()
+
+    def __str__(self):
+        return f"{self.author} - {self.content}"
+class PostLike(BaseModel):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE,related_name='post_likes')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    class Meta:
+        unique_together = ('post', 'profile')
+    
+    def __str__(self):
+        return f"{self.profile} - {self.post}"
+        
+        
     
 class ContractUs(BaseModel):
     name = models.CharField(max_length=100)
