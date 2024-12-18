@@ -130,9 +130,14 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     like_count = serializers.ReadOnlyField()
+    author = ProfileSerializer(read_only=True)
+    post_image_url = serializers.SerializerMethodField()
+    def get_post_image_url(self, obj):
+        if obj.post_image:
+            return obj.post_image.url
     class Meta:
         model = Post
-        fields = 'id','author','content','post_image','like_count'
+        fields = 'id','author','content','post_image','post_image_url','like_count'
 class PostLikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostLike

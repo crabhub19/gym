@@ -265,10 +265,12 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
-    # parser_classes = [MultiPartParser, FormParser]  # Add these parsers
-    def create(self, request, *args, **kwargs):
-        request.data['author'] = request.user.accounts.profile.id
-        return super().create(request, *args, **kwargs)
+    def perform_create(self, serializer):
+        # Use request.user to get the associated profile
+        profile = self.request.user.accounts.profile  # Assuming this relationship exists
+        serializer.save(author=profile)
+        
+        
     @action(detail=True, methods=['post'])
     def like(self, request, pk):
         post = get_object_or_404(Post,pk=pk)

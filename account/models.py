@@ -114,7 +114,7 @@ class PaymentMethod(BaseModel):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     method = models.CharField(max_length=10, choices=METHOD_CHOICES, default='Bkash')
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='Personal')
-    payment_method_image = CloudinaryField("payment_method_image",blank=True,null=True)
+    payment_method_image = CloudinaryField("payment_method_image",folder='payment_method_image',blank=True,null=True)
 
     def __str__(self):
         return self.phone_number
@@ -122,7 +122,7 @@ class PaymentMethod(BaseModel):
 
 class Profile(BaseModel):
     account = models.OneToOneField(Accounts, on_delete=models.CASCADE,related_name='profile')  # One-to-one relationship with Account
-    profile_picture = CloudinaryField("profile_picture",blank=True,null=True)   # URL for Cloudinary
+    profile_picture = CloudinaryField("profile_picture",folder='profile_picture',blank=True,null=True)   # URL for Cloudinary
     followers = models.ManyToManyField(User, related_name="following_profiles", blank=True)
     bio = models.TextField(blank=True)  # Bio field for the user
     about = models.TextField(blank=True)
@@ -150,7 +150,7 @@ class Profile(BaseModel):
 class Post(BaseModel):
     author = models.ForeignKey(Profile, on_delete=models.CASCADE,related_name='posts')
     content = models.TextField(null=True,blank=True)
-    post_image = CloudinaryField("post_image",blank=True,null=True)
+    post_image = CloudinaryField("post_image",folder='post_image',blank=True,null=True)
     @property
     def like_count(self):
         return self.post_likes.count()
