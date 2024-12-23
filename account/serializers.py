@@ -132,13 +132,21 @@ class PostSerializer(serializers.ModelSerializer):
     like_count = serializers.ReadOnlyField()
     author = ProfileSerializer(read_only=True)
     post_image_url = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
     def get_post_image_url(self, obj):
         if obj.post_image:
             return obj.post_image.url
+    def get_is_liked(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            profile = request.user.accounts.profile  # Assuming this relationship exists
+            return obj.post_likes.filter(profile=profile).exists()
+        return False
     class Meta:
         model = Post
-        fields = 'id','author','content','post_image','post_image_url','like_count'
+        fields = 'id','author','content','post_image','post_image_url','like_count','is_liked','created_at'
 class PostLikeSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(read_only=True)
     class Meta:
         model = PostLike
         fields = 'id','post','profile','created_at'

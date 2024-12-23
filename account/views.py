@@ -274,7 +274,7 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def like(self, request, pk):
         post = get_object_or_404(Post,pk=pk)
-        like,created = PostLike.objects.get_or_create(post=post,profile__account__user=request.user)
+        like,created = PostLike.objects.get_or_create(post=post,profile=request.user.accounts.profile)
         if not created:
             like.delete()
         return Response({'detail': 'Like toggled successfully.'}, status=status.HTTP_200_OK)

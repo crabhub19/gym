@@ -88,6 +88,8 @@ class ContractUsAdmin(ModelAdmin):
     pass
 class PostAdmin(ModelAdmin):
     pass
+class PostLikeAdmin(ModelAdmin):
+    pass
 # Register the models and their custom admin views
 admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(Accounts, AccountsAdmin)
@@ -96,3 +98,4 @@ admin.site.register(Profile, ProfileAdmin)
 admin.site.register(PaymentMethod,PaymentMethodAdmin)
 admin.site.register(ContractUs,ContractUsAdmin)
 admin.site.register(Post,PostAdmin)
+admin.site.register(PostLike,PostLikeAdmin)
