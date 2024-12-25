@@ -11,10 +11,11 @@ from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.pagination import PageNumberPagination
 from .models import *
 from .serializers import *
 from .permissions import *
-
+from .pagination import *
 # for sending mails and generate token
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -265,11 +266,23 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
+    pagination_class = fivePagination
     def perform_create(self, serializer):
         # Use request.user to get the associated profile
         profile = self.request.user.accounts.profile  # Assuming this relationship exists
         serializer.save(author=profile)
-        
+    
+    @action(detail=False, methods=['get'])
+    def my_posts(self, request):
+        # Use request.user to get the associated profile
+        profile = request.user.accounts.profile  # Assuming this relationship exists
+        posts = Post.objects.filter(author=profile).order_by('-created_at')
+        page = self.paginate_queryset(posts)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(posts, many=True)
+        return Response(serializer.data)
         
     @action(detail=True, methods=['post'])
     def like(self, request, pk):
