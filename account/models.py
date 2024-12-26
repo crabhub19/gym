@@ -6,13 +6,18 @@ from django.utils import timezone
 import uuid,random
 from datetime import timedelta
 from django.utils.timezone import now
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 #function to generate
 def generate_short_uuid():
     """Generate a unique 4-character UUID."""
     return str(random.randint(1000, 9999))
 
-
+# deactivate_expired_accounts
+def deactivate_expired_accounts():
+    one_month_ago = timezone.now() - timedelta(days=1)
+    Accounts.objects.filter(active=True, activate_date__lte=one_month_ago).update(active=False, activate_date=None)
 
 # Create your models here.
 
@@ -48,12 +53,22 @@ class Accounts(BaseModel):
         ('trainer', 'Trainer'),
         ('manager', 'Manager'),
     ]
-    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name='accounts')  # One-to-one relationship with User
+    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name='accounts') 
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='member')
-    join_date = models.DateField(default=timezone.now)  # Join date field
-    activate_date = models.DateField(null=True,blank=True)
+    join_date = models.DateTimeField(default=timezone.now)  # Join date field
+    activate_date = models.DateTimeField(null=True,blank=True)
     active = models.BooleanField(default=False)
+    def save(self, *args, **kwargs):
+            # Ensure `active` is always True for 'manager' and 'trainer' roles
+        if self.role in ['trainer', 'manager']:
+            self.active = True
+        # Update `activate_date` when `active` is set to True
+        if self.active and not self.activate_date:
+            self.activate_date = timezone.now()
+        elif not self.active:
+            self.activate_date = None  # Reset activate_date if active is set to False
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.user.username

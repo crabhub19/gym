@@ -59,7 +59,10 @@ class AccountsAdmin(ModelAdmin):
     @admin.action(description='make trainer')
     def make_trainer(self, request, queryset):
         queryset.update(role='trainer')
-    actions = ['make_manager', 'make_trainer']
+    @admin.action(description='make active')
+    def make_active(self, request, queryset):
+        queryset.update(active=True)
+    actions = ['make_manager', 'make_trainer', 'make_active']
 
 
 # Customizing the display of Transactions in the admin panel

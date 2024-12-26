@@ -272,17 +272,31 @@ class PostViewSet(viewsets.ModelViewSet):
         profile = self.request.user.accounts.profile  # Assuming this relationship exists
         serializer.save(author=profile)
     
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get','delete'])
     def my_posts(self, request):
-        # Use request.user to get the associated profile
         profile = request.user.accounts.profile  # Assuming this relationship exists
-        posts = Post.objects.filter(author=profile).order_by('-created_at')
-        page = self.paginate_queryset(posts)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(posts, many=True)
-        return Response(serializer.data)
+
+        if request.method == 'GET':
+            posts = Post.objects.filter(author=profile).order_by('-created_at')
+            page = self.paginate_queryset(posts)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(posts, many=True)
+            return Response(serializer.data)
+
+        if request.method == 'DELETE':
+            # Ensure a specific post ID is provided
+            post_id = request.query_params.get('post_id')
+            if not post_id:
+                return Response({'error': 'Post ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                post = Post.objects.get(id=int(post_id), author=profile)
+                post.delete()
+                return Response({'message': 'Post deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+            except Post.DoesNotExist:
+                return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
         
     @action(detail=True, methods=['post'])
     def like(self, request, pk):

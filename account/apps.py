@@ -7,3 +7,5 @@ class AccountConfig(AppConfig):
 
     def ready(self):
         import account.signals
+        from account.scheduler import start_scheduler
+        start_scheduler()
