@@ -267,6 +267,7 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
     pagination_class = fivePagination
+    permission_classes = [IsAuthenticated]
     def perform_create(self, serializer):
         # Use request.user to get the associated profile
         profile = self.request.user.accounts.profile  # Assuming this relationship exists
