@@ -235,9 +235,18 @@ class PaymentMethodViewSet(viewsets.ModelViewSet):
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.filter(account__user__is_active=True)
+    queryset = Profile.objects.filter(account__user__is_active=True).order_by(
+        models.Case(
+            models.When(account__role='manager', then=0),
+            models.When(account__role='trainer', then=1),
+            models.When(account__role='member', then=2),
+            default=3,
+            output_field=models.IntegerField()
+        )
+    )
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = tenPagination
     #  Custom action to fetch the logged-in user's profile
     @action(detail=False, methods=['get','patch','delete'], url_path='me')
     def my_profile(self, request):
@@ -266,7 +275,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
-    pagination_class = fivePagination
+    pagination_class = tenPagination
     permission_classes = [IsAuthenticated]
     def perform_create(self, serializer):
         # Use request.user to get the associated profile

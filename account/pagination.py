@@ -1,3 +1,3 @@
 from rest_framework.pagination import PageNumberPagination
-class fivePagination(PageNumberPagination):
-    page_size = 5
+class tenPagination(PageNumberPagination):
+    page_size = 10
