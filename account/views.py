@@ -1,31 +1,29 @@
 import random
 from rest_framework import viewsets,status
 from rest_framework.permissions import *
-from rest_framework_simplejwt.views import TokenObtainPairView
 from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
-from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.pagination import PageNumberPagination
+from django.shortcuts import render
 from .models import *
 from .serializers import *
 from .permissions import *
 from .pagination import *
+
+
 # for sending mails and generate token
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
-from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
-from .utils import TokenGenerator,generate_token
+from .utils import generate_token
 
 
 
@@ -215,14 +213,14 @@ class AccountViewSet(viewsets.ModelViewSet):
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            return Response({'detail': 'Invalid Token or user not found.'}, status=status.HTTP_400_BAD_REQUEST)
+            return render(request, 'account/email_verification_failed.html')
 
         if generate_token.check_token(user, token):
             user.is_active = True
             user.save()
-            return Response({'detail': 'Email successfully verified.'}, status=status.HTTP_200_OK)
+            return render(request, 'account/email_verified_success.html')
         else:
-            return Response({'detail': 'Invalid or expired token.'}, status=status.HTTP_400_BAD_REQUEST)
+            return render(request, 'account/email_verification_failed.html')
 
 
 class PaymentMethodViewSet(viewsets.ModelViewSet):

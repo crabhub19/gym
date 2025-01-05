@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  text-align: center;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+
+#container {
+  position: relative;
+  margin: auto;
+  overflow: hidden;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
+  font-size: 1.9rem;
+  font-weight: 100;
+  letter-spacing: 3px;
+  padding-top: 5px;
+  color: white;
+  padding-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.alert {
+    background-color: green;
+  color: white;
+  font-weight: 700;
+  letter-spacing: 5px;
+}
+
+
+p {
+  margin-top: -5px;
+  font-size: 1.3rem;
+  font-weight: 100;
+  color: darken(black, 10%);
+  letter-spacing: 1px;
+}
+
+
+#success-box {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  box-shadow: 5px 5px 20px rgba(gray, 10%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+
+.face2 {
+  position: absolute;
+  width: 225px;
+  height: 225px;
+  background: white;
+  border-radius: 50%;
+  border: 1px solid black;
+  top: 10%;
+  z-index: 2;
+  animation: roll 3s ease-in-out infinite;
+}
+
+.eye {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: black;
+  border-radius: 50%;
+  top: 40%;
+  left: 20%;
+}
+
+.right {
+  left: 68%;
+}
+
+.mouth {
+  position:absolute;
+  top: 43%;
+  left: 41%;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+}
+
+.happy {
+  border: 2px solid;
+  border-color: transparent black black transparent;
+  transform: rotate(45deg);
+}
+
+
+.shadow {
+  position: absolute;
+  width: 21%;
+  height: 3%;
+  opacity: .5;
+  background: black;
+  top: 43%;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.scale {
+  animation: scale 1s ease-in infinite;
+}
+.move {
+  animation: move 3s ease-in-out infinite;
+}
+
+
+.message {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  height: 100%;
+  top: 47%;
+}
+
+
+@keyframes bounce {
+  50% {
+     transform: translateY(-10px);
+  }
+}
+
+@keyframes scale {
+  50% {
+    transform: scale(0.9);
+  }
+}
+
+@keyframes roll {
+  0% {
+    transform: rotate(0deg);
+    left: 25%;
+  }
+  50% {
+    left: 60%;
+    transform: rotate(168deg);
+  }
+  100% {
+    transform: rotate(0deg);
+    left: 25%;
+  }
+}
+
+@keyframes move {
+  0% {
+    left: 25%;
+  }
+  50% {
+    left: 60%;
+  }
+  100% {
+    left: 25%;
+  }
+}
+
+    </style>
+</head>
+<body>
+    <div id="container">
+         <div id="success-box">
+          <div class="face2">
+            <div class="eye"></div>
+            <div class="eye right"></div>
+            <div class="mouth happy"></div>
+          </div>
+          <div class="shadow move"></div>
+          <div class="message"><h1 class="alert">verified account successfully</h1><p class="alertP">Now you are able to log in.</p></div>
+        </div> 
+      </div>
+</body>
+</html>
