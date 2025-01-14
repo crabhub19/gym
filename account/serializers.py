@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.models import User
+from app.serializer import *
 from .models import *
-
 
 
 # Serializer for the Authentication model
@@ -53,22 +53,31 @@ class UserSerializer(serializers.ModelSerializer):
 # Serializer for the Account model
 class AccountSerializer(serializers.ModelSerializer):
     user = UserSerializer()  # Use the updated UserSerializer
-
+    course_name = serializers.PrimaryKeyRelatedField(
+        queryset=Course.objects.all(),  # Allows users to select a course by its primary key
+        required=False,  # Course is optional
+        allow_null=True  # Allows null if no course is selected
+    )
+    course_details = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Accounts
-        fields = ['id','user','phone_number','role','active']
+        fields = ['id','user','phone_number','role','active','course_name','course_details']
         extra_kwargs = {
             'role': {'read_only': True},
             'active': {'read_only': True},
         }
-
+    def get_course_details(self, obj):
+        if obj.course_name:
+            return CourseSerializer(obj.course_name).data
     def create(self, validated_data):
         # Extract the user data
         user_data = validated_data.pop('user')
+        # Extract course_name from validated data
+        course_name = validated_data.pop('course_name', None)
         # Create a new User instance
         user = UserSerializer.create(UserSerializer(), validated_data=user_data)
         # Create the Account instance and link it to the user
-        account = Accounts.objects.create(user=user, **validated_data)
+        account = Accounts.objects.create(user=user, course_name=course_name, **validated_data)
         Profile.objects.create(account=account)
         return account
 

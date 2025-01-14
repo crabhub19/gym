@@ -3,11 +3,10 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from cloudinary.models import CloudinaryField
 from django.utils import timezone
-import uuid,random
+import random
 from datetime import timedelta
 from django.utils.timezone import now
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
+from app.models import Course
 
 #function to generate
 def generate_short_uuid():
@@ -56,6 +55,7 @@ class Accounts(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE,related_name='accounts') 
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='member')
+    course_name = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=True)
     join_date = models.DateTimeField(default=timezone.now)  # Join date field
     activate_date = models.DateTimeField(null=True,blank=True)
     active = models.BooleanField(default=False)

@@ -25,6 +25,5 @@ urlpatterns = [
     path('api/request-password-reset/', RequestPasswordResetView.as_view(), name='request-password-reset'),
     path('api/validate-reset-uuid/', ValidatePasswordResetUUIDView.as_view(), name='validate-reset-uuid'),
     path('api/reset-password/', ResetPasswordView.as_view(), name='reset-password'),
-    path('', include(router.urls)),
 ]
 
